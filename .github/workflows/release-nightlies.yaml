@@ -13,12 +13,16 @@ jobs:
   update-assets:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify yesterday nightlies
+      # Verify that all nightlies have passed and have been built in the last 24 hours
+      - name: Verify nightlies
         run: | 
           THRESHOLD=$(($(date +%s) - 86400))000
           : # curl needs --globoff to avoid having to escape all brackets in the url
-          response=$(curl --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
+          response=$(curl -u "GH_USER:GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
           echo $response
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_USER: ${{github.actor}}
       # - name: Download assets
       #   run: |
       #     curl -L "https://example.com/path/to/your/file.zip" -o ./latest-build.zip

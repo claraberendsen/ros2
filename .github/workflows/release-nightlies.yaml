@@ -52,7 +52,7 @@ jobs:
             fi
 
             echo "☀️ $NAME passed all checks."
-          done <<< "$(echo "$JOB_STATUS" | grep -oP '<job>.*?</job>')"
+          done <<< "$(echo "$JOB_STATUS" | sed 's|<job |\n<job |g')"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}

@@ -26,8 +26,9 @@ jobs:
           # This returns a list of Unix timestamps for every asset
           ASSETS=$(gh release view --repo ${{ github.repository }} release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
           if [ -z "$ASSETS" ]; then
-            echo "⚠️ No assets found in the latest release!"
-            exit 1
+            echo "⚠️ No assets found in the release!"
+            : # soft exit to avoid failing on first run of the workflow
+            exit 0                                                    
           fi
           echo "$ASSETS" | while read -r NAME TIME; do
             # Convert ISO 8601 (2026-01-08T...) to Unix seconds

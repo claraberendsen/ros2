@@ -37,8 +37,6 @@ jobs:
             if [ "$ASSET_TS" -gte "$THRESHOLD" ]; then
               echo "Assets are already updated -> (Updated: $TIME)"
               exit 1
-            else
-              echo "✅ Asset '$NAME' is fresh."
             fi
           done
         env:

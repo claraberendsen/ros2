@@ -22,7 +22,7 @@ jobs:
           echo $response
         env:
           GH_TOKEN: ${{ github.token }}
-          GH_USER: ${{github.actor}}
+          GH_USER: claraberendsen
       # - name: Download assets
       #   run: |
       #     curl -L "https://example.com/path/to/your/file.zip" -o ./latest-build.zip

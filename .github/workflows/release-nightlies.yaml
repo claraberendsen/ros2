@@ -21,8 +21,8 @@ jobs:
           response=$(curl -u "GH_USER:GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
           echo $response
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_USER: claraberendsen
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{secrets.GH_USER}}
       # - name: Download assets
       #   run: |
       #     curl -L "https://example.com/path/to/your/file.zip" -o ./latest-build.zip

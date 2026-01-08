@@ -1,0 +1,39 @@
+name: Update Rolling nightlies Assets
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  update-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify yesterday nightlies
+        run: | 
+          THRESHOLD=$(($(date +%s) - 86400))000
+          : # curl needs --globoff to avoid having to escape all brackets in the url
+          response=$(curl --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
+          echo $response
+      # - name: Download assets
+      #   run: |
+      #     curl -L "https://example.com/path/to/your/file.zip" -o ./latest-build.zip
+
+      # - name: Ensure Release Exists and Upload
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     TAG: "v1.0.0-pre"
+      #   run: |
+      #     # 1. Check if the release exists. If not, create it.
+      #     if ! gh release view "$TAG" >/dev/null 2>&1; then
+      #       echo "Release $TAG not found. Creating new pre-release..."
+      #       gh release create "$TAG" --prerelease --title "Nightly Pre-release" --notes "Automated build assets."
+      #     else
+      #       echo "Release $TAG exists. Proceeding to upload."
+      #     fi
+
+      #     # 2. Upload and overwrite (clobber) the asset
+      #     gh release upload "$TAG" ./latest-build.zip --clobber

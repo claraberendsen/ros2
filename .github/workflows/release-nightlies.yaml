@@ -15,7 +15,8 @@ jobs:
     steps:
       # Verify that all nightlies have passed and have been built in the last 24 hours
       - name: Verify conditions for update
-        run: | 
+        run: |
+          set -x 
           echo "Verifying conditions for nightlies update";
 
           THRESHOLD=$(($(date +%s) - 86400))000;

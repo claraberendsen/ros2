@@ -14,12 +14,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Verify that all nightlies have passed and have been built in the last 24 hours
-      - name: Verify nightlies
+      - name: Verify conditions for update
         run: | 
+          echo "Verifying conditions for nightlies update"
           THRESHOLD=$(($(date +%s) - 86400))000
           : # curl needs --globoff to avoid having to escape all brackets in the url
-          response=$(curl -u "$GH_USER:$GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
-          echo $response
+          JOB_STATUS=$(curl -u "$GH_USER:$GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
+         
+          printf "%s" "$JOB_STATUS" | grep -o '<job>.*?</job>' | while read -r JOB_BLOCK; do
+
+            NAME=$(echo "$JOB_BLOCK" | grep -o '<name>.*</name>' | sed 's|<[^>]*>||g')
+            RESULT=$(echo "$JOB_BLOCK" | grep -o '<result>.*</result>' | sed 's|<[^>]*>||g')
+            TS=$(echo "$JOB_BLOCK" | grep -o '<timestamp>.*</timestamp>' | sed 's|<[^>]*>||g')
+
+            echo "Checking Job: $NAME..."
+
+            : # If job is still running then it's not possible to do the update
+            if [ -z "$RESULT" ]; then
+              echo "☁️ Job $NAME is currently in progress or has no result."
+              exit 1
+            fi
+
+            : # If the a job failed then the update should not happen to keep synchrony between os.
+            if [ "$RESULT" = "FAILURE" ]; then
+              echo "🌧️ Job $NAME failed with result: $RESULT"
+              exit 1
+            fi
+
+            : # If the job is older than T-24 then the nightly set has not completed fully yet. 
+            if [ "$TS" -lt "$THRESHOLD" ]; then
+              echo "☁️  Job $NAME is stale! Last run was > 24h ago (TS: $TS)"
+              exit 1
+            fi
+
+            echo "☀️ $NAME passed all checks."
+          done
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}

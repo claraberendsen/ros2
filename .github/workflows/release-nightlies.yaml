@@ -24,7 +24,7 @@ jobs:
 
           # 2. Use 'gh' to get all asset update times
           # This returns a list of Unix timestamps for every asset
-          ASSETS=$(gh release view release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
+          ASSETS=$(gh release view --repo ${{ github.repository }} release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
           if [ -z "$ASSETS" ]; then
             echo "⚠️ No assets found in the latest release!"
             exit 1

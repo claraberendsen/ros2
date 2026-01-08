@@ -2,6 +2,9 @@ name: Update Rolling nightlies Assets
 
 on:
   workflow_dispatch:
+  schedule:
+    # Runs at the start of every hour from 4 AM to 12 PM UTC
+    - cron: '0 4-12 * * *'
   pull_request:
   # push:
   #   branches: [ main ]
@@ -13,6 +16,32 @@ jobs:
   update-assets:
     runs-on: ubuntu-latest
     steps:
+        # Early exit if assets have been updated already by a previous run. 
+      - name: Verify age of assets
+        run: | 
+          NOW=$(date +%s)
+          THRESHOLD=$((NOW - 86400))
+
+          # 2. Use 'gh' to get all asset update times
+          # This returns a list of Unix timestamps for every asset
+          ASSETS=$(gh release view release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
+          if [ -z "$ASSETS" ]; then
+            echo "⚠️ No assets found in the latest release!"
+            exit 1
+          fi
+          echo "$ASSETS" | while read -r NAME TIME; do
+            # Convert ISO 8601 (2026-01-08T...) to Unix seconds
+            ASSET_TS=$(date -d "$TIME" +%s)
+    
+            if [ "$ASSET_TS" -gte "$THRESHOLD" ]; then
+              echo "Assets are already updated -> (Updated: $TIME)"
+              exit 1
+            else
+              echo "✅ Asset '$NAME' is fresh."
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Verify that all nightlies have passed and have been built in the last 24 hours
       - name: Verify conditions for update
         run: |
@@ -35,7 +64,7 @@ jobs:
 
             echo "Checking Job: $NAME..."
 
-            : # If job is still running then it's not possible to do the update
+            : # If job is still running then it's not possible to update
             if [ -z "$RESULT" ]; then
               echo "☁️ Job $NAME is currently in progress or has no result."
               exit 1

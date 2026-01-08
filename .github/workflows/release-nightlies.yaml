@@ -28,7 +28,7 @@ jobs:
           : # the XML returned have a <nightlies /> tag that needs to be cleaned to be able to split each job into a new line
            JOBS=$(echo "$JOB_STATUS" |sed 's|<nightlies[^>]*>||g; s|</nightlies>||g' | sed 's|</job>|</job>\n|g' | sed '/^$/d')
 
-        
+          echo $JOBS
           echo "$JOBS" | while read -r JOB_BLOCK; do
 
             NAME=$(echo "$JOB_BLOCK" | sed -n 's|.*<name>\(.*\)</name>.*|\1|p')

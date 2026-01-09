@@ -101,18 +101,26 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}
-      # - name: Ensure Release Exists and Upload
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #     TAG: "v1.0.0-pre"
-      #   run: |
-      #     # 1. Check if the release exists. If not, create it.
-      #     if ! gh release view "$TAG" >/dev/null 2>&1; then
-      #       echo "Release $TAG not found. Creating new pre-release..."
-      #       gh release create "$TAG" --prerelease --title "Nightly Pre-release" --notes "Automated build assets."
-      #     else
-      #       echo "Release $TAG exists. Proceeding to upload."
-      #     fi
+      - name: Ensure Release Exists and Upload new assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: "release-rolling-nightlies"
+        run: |
+          : # Verify assets exist to upload
+          if [ -d "./assets" ] && [ "$(ls -A ./assets)" ]; then
+            gh release upload "$TAG" ./assets/* --clobber
+          else
+            echo "❌ No assets found to upload!"
+            exit 1
+          fi
+          : # Check if the release exists. If not, create it.
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG not found. Creating new pre-release..."
+            gh release create "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build assets."
+          else
+            echo "Release $TAG exists. Updating date and proceeding to upload."
+            
+          fi
 
-      #     # 2. Upload and overwrite (clobber) the asset
-      #     gh release upload "$TAG" ./latest-build.zip --clobber
+          : # 2. Upload and overwrite (clobber) the assets
+          gh release upload "$TAG" ./assets/* --clobber

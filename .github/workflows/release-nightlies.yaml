@@ -105,7 +105,7 @@ jobs:
         run: |
           echo ${{ github.repository }}
           : # Check if the release exists. If not, create it.
-          if ! gh release view  --repo ${{ github.repository }}"$TAG" >/dev/null 2>&1; then
+          if ! gh release view  --repo ${{ github.repository }} "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG not found. Creating new pre-release..."
             gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build artifacts."
           else

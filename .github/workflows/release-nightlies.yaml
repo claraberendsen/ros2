@@ -52,7 +52,7 @@ jobs:
       # Verify that all nightlies have passed and have been built in the last 24 hours
       - name: Verify conditions for update of artifacts
         id: verification
-        if: steps.check.outputs.should_update = 'true'
+        if: steps.check.outputs.should_update == 'true'
         run: |
           echo "Verifying conditions for nightlies update";
 

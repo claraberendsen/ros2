@@ -1,4 +1,4 @@
-name: Update Rolling nightlies Assets
+name: Update Rolling nightlies artifacts
 
 on:
   workflow_dispatch:
@@ -13,29 +13,29 @@ permissions:
   contents: write
 
 jobs:
-  update-assets:
+  update-artifacts-on-release:
     runs-on: ubuntu-latest
     steps:
-        # Early exit if assets have been updated already by a previous run. 
-      - name: Verify age of assets
+        # Early exit if artifacts have been updated already by a previous run. 
+      - name: Verify age of artifacts
         run: | 
           NOW=$(date +%s)
           THRESHOLD=$((NOW - 86400))
 
           # 2. Use 'gh' to get all asset update times
           # This returns a list of Unix timestamps for every asset
-          ASSETS=$(gh release view --repo ${{ github.repository }} release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
-          if [ -z "$ASSETS" ]; then
-            echo "⚠️ No assets found in the release!"
+          ARTIFACTS=$(gh release view --repo ${{ github.repository }} release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
+          if [ -z "$ARTIFACTS" ]; then
+            echo "⚠️ No artifacts found in the release!"
             : # soft exit to avoid failing on first run of the workflow
             exit 0                                                    
           fi
-          echo "$ASSETS" | while read -r NAME TIME; do
+          echo "$ARTIFACTS" | while read -r NAME TIME; do
             # Convert ISO 8601 (2026-01-08T...) to Unix seconds
             ASSET_TS=$(date -d "$TIME" +%s)
     
             if [ "$ASSET_TS" -gte "$THRESHOLD" ]; then
-              echo "Assets are already updated -> (Updated: $TIME)"
+              echo "Artifacts are already updated -> (Updated: $TIME)"
               exit 1
             fi
           done
@@ -89,38 +89,37 @@ jobs:
           GH_USER: ${{secrets.GH_USER}}
       - name: Download artifacts
         run: | 
-            mkdir -p assetts
-            echo "⬇️ Downloading assets for packaging-linux-amd64" 
-            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-amd64.tar.bz2
-            echo "⬇️ Downloading assets for packaging-linux-arm64"
-            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-aarch64/lastSuccessfulBuild/artifact/ws/ros2-package-linux-aarch64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-arm64.tar.bz2
-            echo "⬇️ Downloading assets for packaging-linux-rhel-amd64"
-            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-rhel/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-rhel-amd64.tar.bz2
-            echo "⬇️ Downloading assets for packaging-windows"
-            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o assetts/ros2-rolling-windows-release-amd64.zip
+            mkdir -p artifacts
+            echo "⬇️ Downloading artifacts for packaging-linux-amd64" 
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o artifacts/ros2-rolling-nightly-linux-amd64.tar.bz2
+            echo "⬇️ Downloading artifacts for packaging-linux-arm64"
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-aarch64/lastSuccessfulBuild/artifact/ws/ros2-package-linux-aarch64.tar.bz2" -o artifacts/ros2-rolling-nightly-linux-arm64.tar.bz2
+            echo "⬇️ Downloading artifacts for packaging-linux-rhel-amd64"
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-rhel/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o artifacts/ros2-rolling-nightly-linux-rhel-amd64.tar.bz2
+            echo "⬇️ Downloading artifacts for packaging-windows"
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o artifacts/ros2-rolling-windows-release-amd64.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}
-      - name: Ensure Release Exists and Upload new assets
+      - name: Update artifacts in release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: "release-rolling-nightlies"
         run: |
-          : # Verify assets exist to upload
-          if [ -d "./assets" ] && [ "$(ls -A ./assets)" ]; then
-            gh release upload "$TAG" ./assets/* --clobber
-          else
-            echo "❌ No assets found to upload!"
-            exit 1
-          fi
+ 
           : # Check if the release exists. If not, create it.
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG not found. Creating new pre-release..."
-            gh release create "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build assets."
+            gh release create "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build artifacts."
           else
             echo "Release $TAG exists. Updating date and proceeding to upload."
             
           fi
-
-          : # 2. Upload and overwrite (clobber) the assets
-          gh release upload "$TAG" ./assets/* --clobber
+         : # Verify artifacts exist and upload
+          if [ -d "/artifacts" ] && [ "$(ls -A /artifacts)" ]; then
+            gh release upload "$TAG" /artifacts/* --clobber
+            echo "🚀 Artifacts updated correctly"
+          else
+            echo "❌ No artifacts found to upload!"
+            exit 1
+          fi

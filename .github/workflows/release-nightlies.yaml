@@ -42,7 +42,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Verify that all nightlies have passed and have been built in the last 24 hours
-      - name: Verify conditions for update
+      - name: Verify conditions for update of artifacts
         run: |
           echo "Verifying conditions for nightlies update";
 
@@ -82,14 +82,21 @@ jobs:
             fi
 
             echo "☀️ $NAME passed all checks."
+
           done
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}
-      # - name: Download assets
-      #   run: |
-      #     curl -L "https://example.com/path/to/your/file.zip" -o ./latest-build.zip
-
+      - name: Download artifacts
+        run: | 
+            echo "⬇️ Downloading assets" 
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-amd64.tar.bz2
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-aarch64/lastSuccessfulBuild/artifact/ws/ros2-package-linux-aarch64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-arm64.tar.bz2
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-rhel/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-rhel-amd64.tar.bz2
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o assetts/ros2-rolling-windows-release-amd64.zip
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{secrets.GH_USER}}
       # - name: Ensure Release Exists and Upload
       #   env:
       #     GH_TOKEN: ${{ github.token }}

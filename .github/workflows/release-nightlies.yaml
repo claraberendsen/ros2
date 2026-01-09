@@ -111,8 +111,8 @@ jobs:
             echo "Release $TAG exists. Updating date and proceeding to upload."
           fi
           : # Verify artifacts exist and upload
-          if [ -d "/artifacts" ] && [ "$(ls -A /artifacts)" ]; then
-            gh release upload --repo ${{ github.repository }}  "$TAG" /artifacts/* --clobber
+          if [ -d "artifacts" ] && [ "$(ls -A artifacts)" ]; then
+            gh release upload --repo ${{ github.repository }}  "$TAG" artifacts/* --clobber
             echo "🚀 Artifacts updated correctly"
           else
             echo "❌ No artifacts found to upload!"

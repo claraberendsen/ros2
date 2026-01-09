@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   update-artifacts-on-release:
+    if: github.repository == 'claraberendsen/ros2'
     runs-on: ubuntu-latest
     steps:
         # Early exit if artifacts have been updated already by a previous run. 

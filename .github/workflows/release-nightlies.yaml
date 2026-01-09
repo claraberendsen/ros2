@@ -43,7 +43,7 @@ jobs:
             ASSET_TS=$(date -d "$TIME" +%s)
     
             if [ "$ASSET_TS" -gt "$THRESHOLD" ]; then
-              echo "Artifact $NAME are already updated -> (Updated: $TIME)"
+              echo "Artifact $NAME is already updated -> (Updated: $TIME)"
               echo "should_update=false" >> "$GITHUB_OUTPUT"
             fi
           done
@@ -131,10 +131,10 @@ jobs:
           : # Check if the release exists. If not, create it.
           if ! gh release view  --repo ${{ github.repository }} "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG not found. Creating new pre-release..."
-            gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes-file release-notes.md 
+            gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes-file ./release-notes.md 
           else
             echo "Release $TAG exists. Updating date and proceeding to upload."
-            gh release edit "$TAG" --repo "${{ github.repository }}" --title "ROS 2 Rolling - Nightlies $(date +%Y-%m-%d)" --notes-file release-notes.md  --prerelease
+            gh release edit "$TAG" --repo "${{ github.repository }}" --title "ROS 2 Rolling - Nightlies $(date +%Y-%m-%d)" --notes-file ./release-notes.md  --prerelease
           fi
           : # Verify artifacts exist and upload
           if [ -d "artifacts" ] && [ "$(ls -A artifacts)" ]; then

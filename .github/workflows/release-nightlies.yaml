@@ -136,7 +136,7 @@ jobs:
             echo "Release $TAG not found. Creating new pre-release..."
             gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes-file ./release-notes.md 
           else
-            echo "Release $TAG exists. Updating date and proceeding to upload."
+            echo "Release $TAG exists. Updating date and uploading."
             gh release edit "$TAG" --repo "${{ github.repository }}" --title "ROS 2 Rolling - Nightlies $(date +%Y-%m-%d)" --notes-file ./release-notes.md  --prerelease
           fi
           : # Verify artifacts exist and upload

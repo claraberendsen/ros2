@@ -119,7 +119,7 @@ jobs:
             gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" -n-otes-file release_notes.md 
           else
             echo "Release $TAG exists. Updating date and proceeding to upload."
-            gh release edit "$TAG" --repo "${{ github.repository }}" --title "ROS 2 Rolling - $(date +%Y-%m-%d)" --notes-file release_notes.md  --prerelease
+            gh release edit "$TAG" --repo "${{ github.repository }}" --title "ROS 2 Rolling - $(date +%Y-%m-%d)" --notes-file release-notes.md  --prerelease
           fi
           : # Verify artifacts exist and upload
           if [ -d "artifacts" ] && [ "$(ls -A artifacts)" ]; then

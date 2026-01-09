@@ -31,11 +31,12 @@ jobs:
           THRESHOLD=$((NOW - 86400))
           : # initially set to run 
           echo "should_update=true" >> $GITHUB_OUTPUT
-          : # 2. Use 'gh' to get all asset update times
+          : # Use 'gh' to get all asset update times
           ARTIFACTS=$(gh release view --repo ${{ github.repository }} "$TAG" --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
           if [ -z "$ARTIFACTS" ]; then
             echo "⚠️ No artifacts found in the release!"
             : # soft exit to avoid failing on first run of the workflow
+            echo "should_update=true" >> $GITHUB_OUTPUT
             exit 0                                                    
           fi
           echo "$ARTIFACTS" | while read -r NAME TIME; do

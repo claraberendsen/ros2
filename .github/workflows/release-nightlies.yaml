@@ -112,7 +112,7 @@ jobs:
             echo "⬇️ Downloading artifacts for packaging-linux-rhel-amd64"
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-rhel/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o artifacts/ros2-rolling-nightly-linux-rhel-amd64.tar.bz2
             echo "⬇️ Downloading artifacts for packaging-windows"
-            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o artifacts/ros2-rolling-windows-release-amd64.zip
+            curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o artifacts/ros2-rolling-nightly-windows-release-amd64.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_USER: ${{secrets.GH_USER}}

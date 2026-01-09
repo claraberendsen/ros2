@@ -106,14 +106,13 @@ jobs:
           : # Check if the release exists. If not, create it.
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG not found. Creating new pre-release..."
-            gh release create "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build artifacts."
+            gh release create  --repo ${{ github.repository }} "$TAG" --prerelease --title "ROS 2 Rolling - Nightlies" --notes "Automated build artifacts."
           else
             echo "Release $TAG exists. Updating date and proceeding to upload."
-            
           fi
           : # Verify artifacts exist and upload
           if [ -d "/artifacts" ] && [ "$(ls -A /artifacts)" ]; then
-            gh release upload "$TAG" /artifacts/* --clobber
+            gh release upload --repo ${{ github.repository }}  "$TAG" /artifacts/* --clobber
             echo "🚀 Artifacts updated correctly"
           else
             echo "❌ No artifacts found to upload!"

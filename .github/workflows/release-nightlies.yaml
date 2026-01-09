@@ -38,7 +38,7 @@ jobs:
             # Convert ISO 8601 (2026-01-08T...) to Unix seconds
             ASSET_TS=$(date -d "$TIME" +%s)
     
-            if [ "$ASSET_TS" -gte "$THRESHOLD" ]; then
+            if [ "$ASSET_TS" -gt "$THRESHOLD" ]; then
               echo "Artifacts are already updated -> (Updated: $TIME)"
               exit 1
             fi

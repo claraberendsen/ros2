@@ -90,10 +90,13 @@ jobs:
       - name: Download artifacts
         run: | 
             mkdir -p assetts
-            echo "⬇️ Downloading assets" 
+            echo "⬇️ Downloading assets for packaging-linux-amd64" 
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-amd64.tar.bz2
+            echo "⬇️ Downloading assets for packaging-linux-arm64"
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-aarch64/lastSuccessfulBuild/artifact/ws/ros2-package-linux-aarch64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-arm64.tar.bz2
+            echo "⬇️ Downloading assets for packaging-linux-rhel-amd64"
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-rhel/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-rhel-amd64.tar.bz2
+            echo "⬇️ Downloading assets for packaging-windows"
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_windows/lastSuccessfulBuild/artifact/ws/ros2-package-windows-AMD64.zip" -o assetts/ros2-rolling-windows-release-amd64.zip
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}

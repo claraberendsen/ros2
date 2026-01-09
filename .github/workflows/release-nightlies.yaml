@@ -8,7 +8,8 @@ on:
   pull_request:
   # push:
   #   branches: [ main ]
-
+env: 
+  TAG: "release-rolling-nightlies"
 permissions:
   contents: write
 
@@ -24,7 +25,7 @@ jobs:
 
           # 2. Use 'gh' to get all asset update times
           # This returns a list of Unix timestamps for every asset
-          ARTIFACTS=$(gh release view --repo ${{ github.repository }} release-nightlies --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
+          ARTIFACTS=$(gh release view --repo ${{ github.repository }} "$TAG" --json assets --template '{{range .assets}}{{.name}} {{.updatedAt}}{{"\n"}}{{end}}')
           if [ -z "$ARTIFACTS" ]; then
             echo "⚠️ No artifacts found in the release!"
             : # soft exit to avoid failing on first run of the workflow
@@ -131,4 +132,3 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: "release-rolling-nightlies"

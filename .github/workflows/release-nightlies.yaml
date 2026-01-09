@@ -89,7 +89,7 @@ jobs:
           GH_USER: ${{secrets.GH_USER}}
       - name: Download artifacts
         run: | 
-            set -x
+            mkdir -p assetts
             echo "⬇️ Downloading assets" 
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux/lastSuccessfulBuild/artifact/ws/ros2-package-linux-x86_64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-amd64.tar.bz2
             curl -u "$GH_USER:$GH_TOKEN" --silent --globoff "https://ci.ros2.org/view/packaging/job/packaging_linux-aarch64/lastSuccessfulBuild/artifact/ws/ros2-package-linux-aarch64.tar.bz2" -o assetts/ros2-rolling-nightly-linux-arm64.tar.bz2

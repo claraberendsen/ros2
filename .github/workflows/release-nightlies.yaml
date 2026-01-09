@@ -40,7 +40,8 @@ jobs:
     
             if [ "$ASSET_TS" -gt "$THRESHOLD" ]; then
               echo "Artifacts are already updated -> (Updated: $TIME)"
-              exit 1
+              gh run --repo ${{ github.repository }} cancel ${{ github.run_id }}
+              gh run --repo ${{ github.repository }} watch ${{ github.run_id }}
             fi
           done
         env:

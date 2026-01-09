@@ -50,7 +50,7 @@ jobs:
 
           : # curl needs --globoff to avoid having to escape all brackets in the url
           
-          JOBS_STATUS=$(curl -u "$GH_USER:$GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"+or+name="packaging_windows-2025"]&wrapper=nightlies')
+          JOBS_STATUS=$(curl -u "$GH_USER:$GH_TOKEN" --silent --globoff 'https://ci.ros2.org/api/xml?tree=jobs[name,lastBuild[timestamp,result]]&xpath=/hudson/job[name="packaging_linux"+or+name="packaging_windows"+or+name="packaging_linux-rhel"+or+name="packaging_linux-aarch64"]&wrapper=nightlies')
 
           : # the XML returned have a <nightlies /> tag that needs to be cleaned to be able to split each job into a new line
           JOBS=$(echo "$JOBS_STATUS" |sed 's|<nightlies[^>]*>||g; s|</nightlies>||g' | sed 's|</job>|</job>\n|g' | sed '/^$/d')

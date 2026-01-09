@@ -113,7 +113,6 @@ jobs:
           > release-notes.md
       - name: Update artifacts in release
         run: |
-          echo ${{ github.repository }}
           : # Check if the release exists. If not, create it.
           if ! gh release view  --repo ${{ github.repository }} "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG not found. Creating new pre-release..."
